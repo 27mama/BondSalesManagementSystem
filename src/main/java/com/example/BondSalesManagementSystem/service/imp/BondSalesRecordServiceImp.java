@@ -20,7 +20,7 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
     private BondSalesRecordDao bondSalesRecordDao;
 
     @Override
-    public List<BondSalesRecord> getAll(String bondsName, String salesName, Date start, Date end) {
+    public List<BondSalesRecord> getRecordByNameAndDate(String bondsName, String salesName, Date start, Date end) {
         return bondSalesRecordDao.findRecordByNameAndDate(bondsName, salesName, start, end);
     }
 
@@ -60,12 +60,23 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
             for (BondSalesRecord record : records) {
                 writer.write(record.getId() + "," + record.getBondsName() + "," + record.getSalesName() + "," + record.getAmount() + "," + formatDate(record.getCreatedAt()) + "," + formatDate(record.getUpdatedAt()) + "\n");
             }
-            writer.close();
-            osw.close();
-            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            try {
+                if (writer!=null) {
+                    writer.close();
+                }
+                if (osw != null) {
+                    osw.close();
+                }
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
@@ -80,7 +91,7 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
             fis = new FileInputStream(file);
             isr = new InputStreamReader(fis);
             reader = new BufferedReader(isr);
-            String line = "";
+            String line;
             List<BondSalesRecord> list = new ArrayList<BondSalesRecord>();
             long start1 = System.currentTimeMillis();
             System.out.println("list开始获取record...");
@@ -106,6 +117,21 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (isr != null) {
+                    isr.close();
+                }
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
         return true;
     }

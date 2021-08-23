@@ -11,10 +11,22 @@ import java.util.List;
 @Mapper
 public interface BondSalesRecordDao extends BondSalesRecordMapper {
 
-    @Select("select id, bonds_name, sales_name, amount, created_at, updated_at from bonds_sales_record " +
-            "where created_at between #{start} and #{end} " +
-            "and bonds_name = #{bondsName}" +
-            "and sales_name = #{salesName}")
+    @Select("<script>" +
+            "select id, bonds_name, sales_name, amount, created_at, updated_at from bonds_sales_record where 1=1" +
+            "<choose>" +
+            "<when test='start!=null and end!=null'>" +
+            "and created_at between #{start} and #{end}" +
+            "</when>" +
+            "<when test='start!=null and end==null'>" +
+            "and created_at &gt;= #{start}" +
+            "</when>" +
+            "<when test='start==null and end!=null'>" +
+            "and created_at &lt;= #{end}" +
+            "</when>" +
+            "</choose>" +
+            "<if test='bondsName!=null'> and bonds_name = #{bondsName} </if>" +
+            "<if test='salesName!=null'> and sales_name = #{salesName} </if>" +
+            "</script>")
     @Results({
             @Result(id=true, property="id", column="ID"),
             @Result(property="bondsName", column="BONDS_NAME"),

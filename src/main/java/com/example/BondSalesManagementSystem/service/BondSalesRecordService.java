@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BondSalesRecordService {
 
-    List<BondSalesRecord> getAll(String bondsName, String salesName, Date start, Date end);
+    List<BondSalesRecord> getRecordByNameAndDate(String bondsName, String salesName, Date start, Date end);
 
     int insertRecord(String bondsName, String salesName, int amount);
 

@@ -18,17 +18,20 @@ public class BondSalesRecordController {
     @Autowired
     private BondSalesRecordService bondSalesRecordService;
 
-    // http://localhost:8080/bsr/find?bondsName=A+bounds&salesName=Sam&start=2018-01-01&end=2019-12-01
+    // http://localhost:8080/bsr/find?bondsName=A&salesName=Sam&start=2018-01-01&end=2019-12-01
+    // http://localhost:8080/bsr/find?start=2018-01-01&end=2019-12-01
+    // http://localhost:8080/bsr/find?bondsName=A&salesName=Sam
+    // http://localhost:8080/bsr/find?bondsName=A&start=2018-01-01
     @RequestMapping(value = "/find", method = RequestMethod.GET)
-    public List<BondSalesRecord> findRecordByNameAndDate(@RequestParam(name = "bondsName") String bondsName,
-                                                         @RequestParam(name = "salesName") String salesName,
-                                                         @RequestParam(name = "start") String start,
-                                                         @RequestParam(name = "end") String end) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = formatter.parse(start);
-        Date endDate = formatter.parse(end);
+    public List<BondSalesRecord> findRecordByNameAndDate(@RequestParam(name = "bondsName", required = false) String bondsName,
+                                                         @RequestParam(name = "salesName", required = false) String salesName,
+                                                         @RequestParam(name = "start", required = false) String start,
+                                                         @RequestParam(name = "end", required = false) String end) throws ParseException {
 
-        return bondSalesRecordService.getAll(bondsName, salesName, startDate, endDate);
+        // 4个值可以同时为空
+        Date startDate = getDateOrNull(start);
+        Date endDate = getDateOrNull(end);
+        return bondSalesRecordService.getRecordByNameAndDate(bondsName, salesName, startDate, endDate);
     }
 
     // http://localhost:8080/bsr/add?bondsName=B&salesName=Sam&amount=2000
@@ -56,5 +59,13 @@ public class BondSalesRecordController {
     @RequestMapping(value = "/export", method = RequestMethod.GET)
     public boolean exportFile(@RequestParam(name = "path") String path) {
         return bondSalesRecordService.exportFile(path);
+    }
+
+    private Date getDateOrNull(String s) throws ParseException {
+        if (s == null) {
+            return null;
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        return formatter.parse(s);
     }
 }
