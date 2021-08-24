@@ -9,7 +9,15 @@ public class Result<T> {
     //数据是否正常请求
     private boolean success;
     //具体返回的数据
-    private T detail;
+    private T user;
+
+    public T getUser() {
+        return user;
+    }
+
+    public void setUser(T user) {
+        this.user = user;
+    }
 
     public String getMsg() {
         return msg;
@@ -27,12 +35,6 @@ public class Result<T> {
         this.success = success;
     }
 
-    public T getDetail() {
-        return detail;
-    }
 
-    public void setDetail(T detail) {
-        this.detail = detail;
-    }
 //... getter and setter
 }

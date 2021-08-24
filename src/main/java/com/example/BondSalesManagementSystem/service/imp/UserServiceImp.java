@@ -27,7 +27,7 @@ public class UserServiceImp implements UserService {
     public Result regist(User user) {
         Result result = new Result();
         result.setSuccess(false);
-        result.setDetail(null);
+        result.setUser(null);
         try {
             User existUser = userDao.findUserByName(user.getName());
             if(existUser != null){
@@ -39,7 +39,7 @@ public class UserServiceImp implements UserService {
                 //System.out.println(user.getId());
                 result.setMsg("注册成功");
                 result.setSuccess(true);
-                result.setDetail(user);
+                result.setUser(user);
             }
         } catch (Exception e) {
             result.setMsg(e.getMessage());
@@ -55,7 +55,7 @@ public class UserServiceImp implements UserService {
     public Result login(User user) {
         Result result = new Result();
         result.setSuccess(false);
-        result.setDetail(null);
+        result.setUser(null);
         try {
             Integer userId= userDao.login(user);
             if(userId == null){
@@ -64,7 +64,7 @@ public class UserServiceImp implements UserService {
                 result.setMsg("登录成功");
                 result.setSuccess(true);
                 user.setId(userId);
-                result.setDetail(user);
+                result.setUser(user);
             }
         } catch (Exception e) {
             result.setMsg(e.getMessage());
