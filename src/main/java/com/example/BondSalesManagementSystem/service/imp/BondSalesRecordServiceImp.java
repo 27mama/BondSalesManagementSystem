@@ -4,26 +4,30 @@ import com.example.BondSalesManagementSystem.dao.BondSalesRecordDao;
 import com.example.BondSalesManagementSystem.model.BondSalesRecord;
 import com.example.BondSalesManagementSystem.service.BondSalesRecordService;
 import com.example.BondSalesManagementSystem.utils.BatchInsertThread;
-import com.example.BondSalesManagementSystem.utils.DateFormatingUtil;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class BondSalesRecordServiceImp implements BondSalesRecordService {
 
     @Autowired
     private BondSalesRecordDao bondSalesRecordDao;
+
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<BondSalesRecord> getRecordByNameAndDate(String bondsName, String salesName, Date start, Date end) {
@@ -46,31 +50,24 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
     }
 
     @Override
-    public List<BondSalesRecord> listAll() {
-        return bondSalesRecordDao.listAll();
-    }
+    public boolean importFile(MultipartFile file) throws IOException {
+        List<String> fileNames = new ArrayList<>();
 
-
-
-    @Override
-    public boolean importFile(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        InputStreamReader inputStreamReader = new InputStreamReader(fis, "UTF-8");
+        InputStream inputStream = file.getInputStream();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(inputStreamReader);
         LineIterator iterator = new LineIterator(reader);
 
         int fileIndex = 1;
         String splitFileName = "part-%s.csv";// 切割后的文件名
         String formatFilename = String.format(splitFileName, fileIndex);
-        String line = "";
+        String line;
         int lineNum = 0;
         int fileLines = 1000000;    //一个子文件100w行数据
 
         FileOutputStream fos = new FileOutputStream(new File(formatFilename));
         OutputStreamWriter osw = new OutputStreamWriter(fos);
         BufferedWriter writer = new BufferedWriter(osw);
-
-        List<String> fileNames = new ArrayList<>();
 
         while (iterator.hasNext()) {
             line = iterator.nextLine();
@@ -88,6 +85,7 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
             lineNum++;
         }
         fileNames.add(formatFilename); //将当前子文件名添加入集合
+        System.out.println("写入第" + fileIndex + "个文件");
         writer.close();
         reader.close();
 
@@ -95,7 +93,7 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
         int len = fileNames.size();
         // 创建线程数
         int threadPoolSize = len;
-        // 最多创建 4 个线程
+        // 最多创建 9 个线程
         if (threadPoolSize > 4) {
             threadPoolSize = 4;
         }
@@ -104,17 +102,33 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
 
         for (int i = 0; i < len; i++) {
             String filename = fileNames.get(i);
-            File temp = new File(filename);
-            BatchInsertThread thread = new BatchInsertThread(temp, bondSalesRecordDao, i);
+            BatchInsertThread thread = new BatchInsertThread(filename, bondSalesRecordDao, i);
             executor.execute(thread);
         }
         executor.shutdown();
 
+//        try {
+//            // awaitTermination返回false即超时会继续循环，返回true即线程池中的线程执行完成主线程跳出循环往下执行，每隔10秒循环一次
+//            while (!executor.awaitTermination(10, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            logger.error("error", e);
+//            return false;
+//        }
+
         long end = System.currentTimeMillis();
-        System.out.println("总耗时：" + (end - start) + "ms");
+        System.out.println("多线程导入数据总耗时：" + (end - start) + "ms");
+        return true;
+    }
 
+    /**
+     * 将文件写成子文件，并将子文件名保存在fileNames中
+     *
+     * @param file
+     * @param fileNames
+     * @throws IOException
+     */
+    private void writeSubFiles(MultipartFile file, List<String> fileNames) throws IOException {
 
-        return false;
     }
 
 

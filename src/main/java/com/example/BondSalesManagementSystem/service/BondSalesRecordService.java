@@ -14,14 +14,12 @@ public interface BondSalesRecordService {
 
     int insertRecord(String bondsName, String salesName, int amount, Date createdAt);
 
-    List<BondSalesRecord> listAll();
-
     /**
      * import file
      * @param file
      * @return
      */
-    boolean importFile(File file) throws IOException;
+    boolean importFile(MultipartFile file) throws IOException;
 
     /**
      * batch insert records

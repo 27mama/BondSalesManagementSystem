@@ -4,6 +4,8 @@ import com.example.BondSalesManagementSystem.dao.UserDao;
 import com.example.BondSalesManagementSystem.model.Result;
 import com.example.BondSalesManagementSystem.model.User;
 import com.example.BondSalesManagementSystem.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
@@ -16,6 +18,8 @@ import java.util.List;
 public class UserServiceImp implements UserService {
     @Autowired
     private UserDao userDao;
+
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<User> listAll() {
@@ -47,7 +51,7 @@ public class UserServiceImp implements UserService {
             }
         } catch (Exception e) {
             result.setMsg(e.getMessage());
-            e.printStackTrace();
+            logger.error("error", e);
         }
         return result;
     }
@@ -74,7 +78,7 @@ public class UserServiceImp implements UserService {
             }
         } catch (Exception e) {
             result.setMsg(e.getMessage());
-            e.printStackTrace();
+            logger.error("error", e);
         }
         return result;
     }

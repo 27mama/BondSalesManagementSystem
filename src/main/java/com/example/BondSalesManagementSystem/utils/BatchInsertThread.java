@@ -6,29 +6,31 @@ import com.example.BondSalesManagementSystem.model.BondSalesRecord;
 import org.apache.commons.io.LineIterator;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BatchInsertThread implements Runnable {
-    private File file;
+    private String filename;
     private BondSalesRecordDao bondSalesRecordDao;
     private int threadId;
 
-    public BatchInsertThread(File file, BondSalesRecordDao bondSalesRecordDao, int threadId) {
-        this.file = file;
+    public BatchInsertThread(String filename, BondSalesRecordDao bondSalesRecordDao, int threadId) {
+        this.filename = filename;
         this.bondSalesRecordDao = bondSalesRecordDao;
         this.threadId = threadId;
     }
 
     @Override
     public void run() {
+        File file = new File(filename);
         FileInputStream fis = null;
         InputStreamReader isr = null;
         BufferedReader reader = null;
 
         try {
             fis = new FileInputStream(file);
-            isr = new InputStreamReader(fis, "UTF-8");
+            isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
             reader = new BufferedReader(isr);
 
             LineIterator iterator = new LineIterator(reader);
@@ -56,23 +58,23 @@ public class BatchInsertThread implements Runnable {
                     int success = bondSalesRecordDao.batchInsert(list);
                     insert += success;
                     list.clear();
-                    System.out.println("thread " + threadId + " " + "第" + (i++) + "批" + batchAmount + "条数据读取并插入完毕");
+                    System.out.println("thread " + threadId + " " + "第" + (i++) + "批数据读取并插入完毕");
                 }
             }
             if (list.size() > 0) {
                 int success = bondSalesRecordDao.batchInsert(list);
                 insert += success;
                 list.clear();
-                System.out.println("thread " + threadId + " " + "第" + (i++) + "批" + batchAmount + "条数据读取并插入完毕");
+                System.out.println("thread " + threadId + " " + "第" + (i++) + "批条数据读取并插入完毕");
             }
             long end = System.currentTimeMillis();
             System.out.println("thread " + threadId + " " + "插入数据库完成， 用时" + (end - start) / 1000 + "s");
             System.out.println("thread " + threadId + " " + insert + " records successfully inserted!");
 
-            if (this.file.exists() && this.file.isFile()) {
-                this.file.delete();
+            if (file.exists() && file.isFile()) {
+                file.delete();
             }
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
