@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateFormatingUtil {
+
     public static String formatDate(Date date) {
         if (date == null) {
             return "";
@@ -13,15 +14,9 @@ public class DateFormatingUtil {
         return sdf.format(date);
     }
 
-    public static Date formatDate(String dateStr) {
+    public static Date formatDate(String dateStr) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = null;
-        try {
-            date = sdf.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return date;
-        }
+        Date date = sdf.parse(dateStr);
         return date;
     }
 }

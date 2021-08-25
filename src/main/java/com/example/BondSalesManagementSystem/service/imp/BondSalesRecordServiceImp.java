@@ -93,9 +93,9 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
         int len = fileNames.size();
         // 创建线程数
         int threadPoolSize = len;
-        // 最多创建 9 个线程
-        if (threadPoolSize > 4) {
-            threadPoolSize = 4;
+        // 最多创建 6 个线程
+        if (threadPoolSize > 6) {
+            threadPoolSize = 6;
         }
         long start = System.currentTimeMillis();
         ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
@@ -107,13 +107,13 @@ public class BondSalesRecordServiceImp implements BondSalesRecordService {
         }
         executor.shutdown();
 
-//        try {
-//            // awaitTermination返回false即超时会继续循环，返回true即线程池中的线程执行完成主线程跳出循环往下执行，每隔10秒循环一次
-//            while (!executor.awaitTermination(10, TimeUnit.SECONDS));
-//        } catch (InterruptedException e) {
-//            logger.error("error", e);
-//            return false;
-//        }
+        try {
+            // awaitTermination返回false即超时会继续循环，返回true即线程池中的线程执行完成主线程跳出循环往下执行，每隔10秒循环一次
+            while (!executor.awaitTermination(10, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            logger.error("error", e);
+            return false;
+        }
 
         long end = System.currentTimeMillis();
         System.out.println("多线程导入数据总耗时：" + (end - start) + "ms");

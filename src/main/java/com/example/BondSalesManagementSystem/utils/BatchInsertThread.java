@@ -4,9 +4,12 @@ package com.example.BondSalesManagementSystem.utils;
 import com.example.BondSalesManagementSystem.dao.BondSalesRecordDao;
 import com.example.BondSalesManagementSystem.model.BondSalesRecord;
 import org.apache.commons.io.LineIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +17,8 @@ public class BatchInsertThread implements Runnable {
     private String filename;
     private BondSalesRecordDao bondSalesRecordDao;
     private int threadId;
+
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     public BatchInsertThread(String filename, BondSalesRecordDao bondSalesRecordDao, int threadId) {
         this.filename = filename;
@@ -74,8 +79,8 @@ public class BatchInsertThread implements Runnable {
             if (file.exists() && file.isFile()) {
                 file.delete();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException | ParseException e) {
+            logger.error("error", e);
         } finally {
             try {
                 if (reader != null) {
@@ -88,7 +93,7 @@ public class BatchInsertThread implements Runnable {
                     fis.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("error", e);
             }
         }
 
