@@ -26,6 +26,7 @@ public interface BondSalesRecordDao extends BondSalesRecordMapper {
             "</choose>" +
             "<if test='bondsName!=null'> and bonds_name = #{bondsName} </if>" +
             "<if test='salesName!=null'> and sales_name = #{salesName} </if>" +
+            "order by amount desc" +
             "</script>")
     @Results({
             @Result(id=true, property="id", column="ID"),

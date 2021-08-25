@@ -3,6 +3,7 @@ package com.example.BondSalesManagementSystem.service;
 import com.example.BondSalesManagementSystem.model.Result;
 import com.example.BondSalesManagementSystem.model.User;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface UserService {
@@ -15,4 +16,6 @@ public interface UserService {
     Result regist(User user);
 
     Result login(User user);
+
+    Result logout();
 }

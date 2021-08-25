@@ -1,7 +1,10 @@
 package com.example.BondSalesManagementSystem.service;
 
 import com.example.BondSalesManagementSystem.model.BondSalesRecord;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -9,23 +12,16 @@ public interface BondSalesRecordService {
 
     List<BondSalesRecord> getRecordByNameAndDate(String bondsName, String salesName, Date start, Date end);
 
-    int insertRecord(String bondsName, String salesName, int amount);
+    int insertRecord(String bondsName, String salesName, int amount, Date createdAt);
 
     List<BondSalesRecord> listAll();
 
     /**
-     * export file to path
-     * @param path
+     * import file
+     * @param file
      * @return
      */
-    boolean exportFile(String path);
-
-    /**
-     * import file from path
-     * @param path
-     * @return
-     */
-    boolean importFile(String path);
+    boolean importFile(File file) throws IOException;
 
     /**
      * batch insert records

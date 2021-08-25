@@ -10,6 +10,8 @@ public class Result<T> {
     private boolean success;
     //具体返回的数据
     private T user;
+    //返回Token
+    private String token;
 
     public T getUser() {
         return user;
@@ -35,6 +37,13 @@ public class Result<T> {
         this.success = success;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
 //... getter and setter
 }
